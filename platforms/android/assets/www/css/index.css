@@ -1,0 +1,115 @@
+
+* {
+	margin: 0px;
+	padding: 0px;
+    -webkit-tap-highlight-color: rgba(0,0,0,0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
+}
+
+body {
+    -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
+    -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
+    -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
+    background-color:white;
+    background-attachment:fixed;
+    font-family:'HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
+    text-transform:uppercase;
+}
+
+
+
+/* Portrait layout (default) */
+.app {
+
+    text-align:center;
+  
+}
+
+header{
+	height:100px;
+	background-color: orange;
+	margin-bottom:5%;
+}
+
+header h1 {
+	font-weight:bolder;
+	padding-top: 20px;
+	margin-bottom:auto;
+	font-size:60px;
+    overflow:visible;
+    text-align:center;
+    vertical-align: middle;
+}
+p#buttons {
+	width:80%;
+	margin:20%;
+	text-align:center;
+	border-color:orange;
+	border:5%;
+	border-style:solid;
+	border-radius: 10px;
+	background-color: white;
+	margin-left: auto;
+    margin-right: auto;
+    padding:4% 0%;
+}
+
+p#buttons a{
+	padding:0% 20%;
+	font-size:20px;
+	font-weight:bolder;
+	text-decoration:none;
+}
+
+p#buttons a:link {
+	padding:0% 20%;
+	font-size:20px;
+	font-weight:bolder;
+	text-decoration:none;
+	color:black;
+}
+
+p#buttons a:visited {
+	padding:0% 20%;
+	color:black;
+	font-weight:bolder;
+	text-decoration:none;
+}
+
+
+
+
+.event {
+    border-radius:4px;
+    -webkit-border-radius:4px;
+    color:#FFFFFF;
+    font-size:12px;
+    margin:0px 30px;
+    padding:2px 0px;
+}
+
+.event.listening {
+    background-color:#333333;
+    display:block;
+}
+
+.event.received {
+    background-color:#4B946A;
+    display:none;
+}
+
+@keyframes fade {
+    from { opacity: 1.0; }
+    50% { opacity: 0.2; }
+    to { opacity: 1.0; }
+}
+ 
+@-webkit-keyframes fade {
+    from { opacity: 1.0; }
+    50% { opacity: 0.2; }
+    to { opacity: 1.0; }
+}
+ 
+.blink {
+    animation:fade 3000ms infinite;
+    -webkit-animation:fade 3000ms infinite;
+}

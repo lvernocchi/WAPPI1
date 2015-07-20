@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="jquery-1.9.js"></script>
+        <script type="text/javascript" src="../base.js"></script>
+    	<script type="text/javascript" charset="utf-8"></script>
+        <link rel="stylesheet" type="text/css" href="css/pages.css">
+        <title>W A P P I</title>
+    </head>
+        <body onload="onLoad()">
+        
+        <script>
+        		var lastChk;
+        		var total;
+        		var current;
+        		var Time;
+        		var path="checkpoint.txt";
+        		
+		        function onLoad() {
+		            if(( /(ipad|iphone|ipod|android)/i.test(navigator.userAgent) )) {
+		                document.addEventListener('deviceready', initApp, false);
+		            } else {
+		                updateData('need run on mobile device for full functionalities.');
+		            }
+		        };
+		       
+			        
+		        function initApp() {
+		        	getMobileTraffic();
+		            window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFSread, readFail);
+		        	document.getElementById('buttons').addEventListener("click",save);
+		        	document.getElementById('buttons1').addEventListener("click",makeDiff);
+		        	document.getElementById('buttons2').addEventListener("click",reset);
+		        };
+
+		        function makeDiff(){
+		        	current=0;
+		        	var t=Number(total);
+		        	var l = Number(lastChk);
+		        	if(t>l){
+		        		current=t-l;
+		        	}
+		        	alert("The difference is: "+current+" Mb");
+		        }
+		        
+		        function save(){
+		        	saveData();
+		        	saveTime();
+		        }
+		        
+		        function reset(){  
+		        	saveTime();
+		            window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFSReset, writeFail);
+		        }
+		        
+		        function gotFSReset(fileSystem) {
+		            fileSystem.root.getFile(path, {create: true, exclusive: false}, gotFileEntryReset, writeFail);
+		        }
+
+		        function gotFileEntryReset(fileEntry) {
+		            fileEntry.createWriter(gotFileWriterReset, writeFail);
+		        }
+
+		        function gotFileWriterReset(writer) {
+		            writer.onwriteend = function(evt) {
+		                console.log("contents of file now 'some sample text'");
+		          	};
+		            writer.write('0');
+		            updateDataYest('0');
+		            lastChk='0';
+		        }
+		        
+		        
+		        //LETTURA FILE
+		        function gotFSread(fileSystem){
+		            fileSystem.root.getFile("checkpoint.txt", null, gotFileEntry, readFail);
+		            fileSystem.root.getFile("time.txt", null, gotFileEntryReadTime, readFail);
+		        }
+
+		        function gotFileEntry(fileEntry) {
+		            fileEntry.file(gotFile, readFail);
+		        }
+
+		        function gotFile(file){
+		            readAsText(file);
+		        }
+
+		        function readAsText(file) {
+		            var reader = new FileReader();
+		            reader.onloadend = function(evt) {
+		                console.log("Read as text");
+		                lastChk=evt.target.result;
+		                updateDataYest(lastChk);
+		            };
+		            reader.readAsText(file);
+		        }
+		        
+		        //LETTURA DATA
+		        function gotFileEntryReadTime(fileEntry) {
+		            fileEntry.file(gotFileReadTime, readFail);
+		        }
+
+		        function gotFileReadTime(file){
+		            readAsTextTime(file);
+		        }
+
+		        function readAsTextTime(file) {
+		            var reader = new FileReader();
+		            reader.onloadend = function(evt) {
+		                console.log("Read as text");
+		                Time=evt.target.result;
+		                updateDataTime(Time);
+		            };
+		            reader.readAsText(file);
+		        }
+
+		        function readFail(evt) {
+		        	lastChk='0';
+		        	updateDataYest(lastChk);
+		        }
+		      	
+		        //SCRITTURA TEMPO DI CHECKPOINT
+		        function saveTime() {   	
+		            window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFSTime, writeFail);
+		        }
+		        
+		        function gotFSTime(fileSystem) {
+		            fileSystem.root.getFile("time.txt", {create: true, exclusive: false}, gotFileEntryTime, writeFail);
+		        }
+
+		        function gotFileEntryTime(fileEntry) {
+		            fileEntry.createWriter(gotFileWriterTime, writeFail);
+		        }
+
+		        function gotFileWriterTime(writer) {
+		            writer.onwriteend = function(evt) {
+		                console.log("contents of file now 'some sample text'");
+		          	};
+		          	var time = new Date();
+		          	var min;
+		          	if(time.getMinutes()<10){
+		          		min="0"+time.getMinutes();
+		          	}else{
+		          		min=time.getMinutes();
+		          	}
+		          	var status = time.getDate()+"/"+(time.getMonth()+1)+"/"+time.getFullYear()+"\n at: "+time.getHours()+":"+min+":"+time.getSeconds();
+		            writer.write(status);
+		            updateDataTime(status);			            
+		        }
+		        
+		         function writeFail(error){
+		             alert("scrittura sbagliata");
+		         };
+		       
+		        
+		        //SCRITTURA FILE
+		        function saveData() {   	
+		            window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFSwrite, writeFail);
+		        }
+		        
+		        function gotFSwrite(fileSystem) {
+		            fileSystem.root.getFile(path, {create: true, exclusive: false}, gotFileEntryWrite, writeFail);
+		        }
+
+		        function gotFileEntryWrite(fileEntry) {
+		            fileEntry.createWriter(gotFileWriter, writeFail);
+		        }
+
+		        function gotFileWriter(writer) {
+		            writer.onwriteend = function(evt) {
+		                console.log("contents of file now 'some sample text'");
+		          	};
+		            writer.write(window.total);
+		            updateDataYest(window.total);			            
+		        }
+		        
+		         function writeFail(error){
+		             alert("scrittura sbagliata");
+		         };
+		        	        
+		        
+		        function updateData (status){
+		        	total=parseInt(status);
+		            document.getElementById('status').innerText = status;
+		        };
+		        
+		        function updateDataYest (status){
+		        	lastChk=parseInt(status);
+		            document.getElementById('textArea').innerText = status;
+		        };
+		        
+		        function updateDataTime (status){
+		        	lastChk=parseInt(status);
+		            document.getElementById('text').innerText = status;
+		        };
+
+		        
+		        function getMobileTraffic(){
+		            xFace.TrafficStats.getMobileTraffic(function (data){
+		              updateData(data);
+		            },fail);
+		         };
+
+		         function fail(error){
+		             alert("fallimento di calcolo");
+		         };
+		        
+
+        </script>
+        
+        <div class="app">
+            <header><h1>I N T E R N E T</h1></header>
+            
+            <div id="device" class="b">
+                <p id="info">CHECKPOINT <span id="text"></span>: </br>
+                						<span id="textArea"></span> Mb
+                </p>
+                <p id="info">TOTALE: <span id="status"></span> Mb</p>
+                <p id="buttons" class="butt">c h e c k p o i n t</p>
+                <p id="buttons1" class="butt">d i f f e r e n c e</p>
+                <p id="buttons2" class="butt">r e s e t c h e c k</p>
+                <p id="buttons3" class="butt"><a href="index.html">b a c k</a></p>
+            </div>
+        </div>
+        
+
+    </body>
+</html>

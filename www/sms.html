@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+        <title>Hello World</title>
+        <script type="text/javascript" src="cordova.js"></script>
+        <script type="text/javascript" src="jquery-1.9.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/pages.css">
+    </head>
+    <body onload="onLoad()">
+        <script>
+        var yesterday=0;
+        var today=0;
+        
+        function onLoad() {
+            if(( /(ipad|iphone|ipod|android)/i.test(navigator.userAgent) )) {
+                document.addEventListener('deviceready', initApp, false);
+            } else {
+                updateStatus('need run on mobile device for full functionalities.');
+            }
+        }
+
+        
+        function initApp() {
+        	if (! SMS ) { alert( 'SMS plugin not ready' ); return; }
+        	listSMSToday();
+        	listSMSYest();
+        	listSMSWeek();
+        	document.getElementById('buttons').addEventListener('click',comunication);
+        }
+        
+        function updateDataY( str ) {
+        	$('span#dataY').html( str );
+        }
+        
+        function updateDataT( str ) {
+        	$('span#dataT').html( str );
+        }
+        
+        function updateDataW( str ) {
+        	$('span#dataW').html( str );
+        }
+        
+        
+        function listSMSWeek() {
+    		
+        	if(SMS) SMS.listSMS({}, function(data){
+    			var to = new Date();
+    			var sevenDays=7*24*60*60*1000;
+    			var lastweek = to.getTime() - sevenDays;
+    			var from = new Date(lastweek);
+    			var count = 0;
+        		if(Array.isArray(data)) {
+        			for(var i in data) {
+        				var sms = data[i];
+        				var n = Number(sms.date);
+        				var check = new Date(n);
+        				
+        				if(check.getTime()<=to.getTime() && check.getTime()>=from.getTime()){
+        					count=count+1;
+        				}	
+        			}
+        		}
+        		updateDataW(count.toString());
+        		
+        	}, function(err){
+        		updateStatus('error list sms: ' + err);
+        	});
+        }
+        
+        function listSMSYest() {
+        	if(SMS) SMS.listSMS({}, function(data){
+    			var currentTime = new Date();
+    			currentTime.setDate(currentTime.getDate() - 1);
+    			var count = 0;
+        		if(Array.isArray(data)) {
+        			for(var i in data) {
+        				var sms = data[i];
+        				var n = Number (sms.date);
+        				var date = new Date(n);
+        				
+        				if(currentTime.getDate()==date.getDate() && currentTime.getMonth()==date.getMonth() && currentTime.getYear()==date.getYear()){
+        					count = count + 1;
+        				} 				
+        			}
+        		}
+        		yesterday=count;
+        		updateDataY(count.toString());
+        		
+        	}, function(err){
+        		updateStatus('error list sms: ' + err);
+        	});
+        }
+        
+        function listSMSToday() {    		
+        	if(SMS) SMS.listSMS({}, function(data){
+    			//updateData( JSON.stringify(data) );
+    			var currentTime = new Date(); 
+    			var count = 0;
+        		if(Array.isArray(data)) {
+        			for(var i in data) {
+        				var sms = data[i];
+        				var n = Number (sms.date);
+        				var date = new Date(n);		
+        				if(currentTime.getDate()==date.getDate() && currentTime.getMonth()==date.getMonth() && currentTime.getYear()==date.getYear()){
+        					count = count + 1;
+        				}
+        			}
+        		}
+        		today=count;
+        		updateDataT(count.toString());
+        		
+        	}, function(err){
+        		updateStatus('error list sms: ' + err);
+        	});
+        }
+        	
+        	function comunication(){
+            	if(today>yesterday){
+         			if(today-yesterday<=10){
+            			alert("Sei peggiorato rispetto a ieri :( ");	
+         			}else{
+         				alert("Con chi scrivi?? Non stai esagerando un po troppo con questi sms ;) ");
+         			}
+            	}else if(today<yesterday){
+            		alert("Molto bene!! Continua così :D");
+            	}else{
+            		alert("Occhio sei a rischio negativo D: ");
+            	}
+            }
+        
+
+        </script>
+        <div id="fullpage">          
+            <header><h1>S M S</h1></header>
+            <div id="device" class="b">
+                <p id="info">IERI: <span id='dataY'></span></p>
+                <p id="info">OGGI: <span id='dataT'></span></p> 
+                <p id="info">ULTIMI SETTE GIORNI: <span id='dataW'></span></p>
+                <p id="buttons" class="butt">c h e c k p o i n t</p>
+                <p id="buttons" class="butt"><a href="index.html">b a c k</a></p>
+            </div>            
+
+       </div>
+    </body>
+</html>
